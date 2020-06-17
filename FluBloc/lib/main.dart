@@ -1,6 +1,6 @@
+import 'package:FluBloc/BlocProvider.dart';
 import 'package:FluBloc/model.dart';
 import 'package:flutter/material.dart';
-import 'package:scoped_model/scoped_model.dart';
 
 void main() {
   runApp(MyApp());
@@ -10,8 +10,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ScopedModel(
-      model: CounterModel(),
+    return BlocProvider(
+      counterBloc: CounterBloc(),
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
@@ -36,7 +36,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-
+    final counterBloc = BlocProvider.of<CounterBloc>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -48,23 +48,21 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               'You have pushed the button this many times:',
             ),
-            ScopedModelDescendant<CounterModel>(
-              rebuildOnChange: false,
-              builder: (context, _, model) => Text(
-                '${model.counter}',
+            StreamBuilder<int>(
+              stream: counterBloc.counter,
+              initialData: 0,
+              builder: (context, snapshot) => Text(
+                '${snapshot.data}',
                 style: Theme.of(context).textTheme.headline4,
               ),
             )
           ],
         ),
       ),
-      floatingActionButton: ScopedModelDescendant<CounterModel>(
-        rebuildOnChange: false,
-        builder: (context, _, model) => FloatingActionButton(
-          onPressed: () => model.increment(),
-          tooltip: 'Increment',
-          child: Icon(Icons.add),
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => counterBloc.increment.add(0),
+        tooltip: 'Increment',
+        child: Icon(Icons.add),
       ),
     );
   }

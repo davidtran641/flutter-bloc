@@ -1,11 +1,20 @@
-import 'package:scoped_model/scoped_model.dart';
+import 'dart:async';
 
-class CounterModel extends Model {
+import 'package:rxdart/rxdart.dart';
+
+class CounterBloc {
   int _counter = 0;
-  int get counter => _counter;
 
-  void increment() {
-    _counter ++;
-    notifyListeners();
+  Sink<void> get increment => _counterController.sink;
+  final _counterController = StreamController<void>();
+
+  Stream<int> get counter => _counterSubject.stream;
+  final _counterSubject = BehaviorSubject<int>();
+
+  CounterBloc() {
+    _counterController.stream.listen((event) {
+      _counter ++;
+      _counterSubject.add(_counter);
+    });
   }
 }
